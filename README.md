@@ -1,10 +1,10 @@
 # UEFA Champions League 2025/26 — Knockout Stage Prediction
 
-A data-driven approach to predicting the 2025/26 UCL Round of 16 through to the Final, using composite strength scoring, logistic win probabilities, and Monte Carlo bracket simulation across three independently constructed datasets.
+A data-driven approach to predicting the 2025/26 UCL Round of 16 through to the Final using composite strength scoring, logistic win probabilities, and Monte Carlo bracket simulation across three independently constructed datasets.
 
 ## Objective
 
-Predict the outcome of all 8 Round of 16 ties and propagate winners through Quarter-Finals, Semi-Finals, and the Final using a fixed knockout bracket — not a league-style probability ranking.
+Predict the outcome of all 8 Round of 16 ties and propagate winners through Quarter-Finals, Semi-Finals, and the Final using a fixed knockout bracket. 
 
 ## Data Sources
 
@@ -12,38 +12,33 @@ Predict the outcome of all 8 Round of 16 ties and propagate winners through Quar
 
 **Champions League group/league phase stats**: 8 matches per team — GF, GA, Points.
 
-**UEFA Country Coefficients (2025/26)**: England (22.29), Germany (17.57), Spain (17.41), Italy (17.36), Portugal (16.60), France (14.96), Turkey (10.28), Norway (10.28).
+**UEFA Country Coefficients (2025/26)**: England (22.29), Germany (17.57), Spain (17.41), Italy (17.36), Portugal (16.60), France (14.96), Turkey (10.28), Norway (10.28 - boosted to account for team improvement in play).
 
 ## Methodology
 
 ### Phase 1 — Data Generation (Three Datasets)
 
-Three datasets were constructed, each merging domestic and CL performance under different assumptions about domestic league strength. All three share the same output schema: GF per game, GA per game, and Points Percentage.
+Three datasets were constructed with each merging domestic and CL performance under different assumptions about domestic league strength. All three share the same output schema: GF per game, GA per game, and Points Percentage.
 
-**Dataset A (Raw Merged)** applies no league-strength adjustment. Domestic and CL stats are summed directly and normalized by total games played. Every goal counts equally regardless of league. This serves as the control.
+**Dataset A (Raw Merged)** (applies no league-strength adjustment): Domestic and CL stats are summed directly and normalized by total games played. Every goal counts equally regardless of league. This serves as the control.
 
-**Dataset B (UEFA Coefficient-Weighted)** scales domestic stats by normalized UEFA country coefficients (EPL = 1.0 baseline). Offensive metrics (GF, Points_Pct) are multiplied by the weight; GA is divided by it, penalizing conceding in weaker leagues. CL stats remain raw. The coefficient range spans 0.46 to 1.00, meaning a team in the weakest league retains less than half their domestic output.
+**Dataset B (UEFA Coefficient-Weighted)** (scales domestic stats by normalized UEFA country coefficients with EPL = 1.0 baseline): Offensive metrics (GF, Points_Pct) are multiplied by the weight; GA is divided by it, penalizing conceding in weaker leagues. CL stats remain raw. The coefficient range spans 0.46 to 1.00 meaning a team in the weakest league retains less than half their domestic output.
 
-**Dataset C (Compressed Prior)** applies the same coefficient logic as Dataset B but compresses the weight range to 0.70–1.00 using linear rescaling: `weight = 0.70 + 0.30 × (coeff − min) / (max − min)`. This preserves league-quality signal without letting it dominate, ensuring every team retains at least 70% of their domestic output.
+**Dataset C (Compressed Prior)** applies the same coefficient logic as Dataset B but compresses the weight range to 0.70–1.00 using linear rescaling: `weight = 0.70 + 0.30 × (coeff − min) / (max − min)`. This preserves league-quality signal without letting it dominate ensuring every team retains at least 70% of their domestic output.
 
 ### Phase 2 — Visualization
 
-Four chart types were produced per dataset to validate the data before modelling:
-
-- **Horizontal bar rankings** (9 charts) — all 16 teams ranked by each feature, colour-coded by team colours, across all three datasets.
-- **Matchup radar charts** (24 charts) — z-scored feature profiles overlaid per R16 tie, revealing attack/defence asymmetries.
-- **Correlation heatmaps** (3 charts) — Pearson r between GF, GA, and Points_Pct per dataset, checking for feature redundancy before weighting.
-- **Dataset comparison strip plot** (1 chart) — each team's composite strength score plotted across all three datasets to visualise sensitivity to coefficient assumptions.
+Chart types were produced per dataset to validate the data before modelling:
 
 ### Phase 3 — Strength Scoring & Bracket Simulation
 
 #### Normalization: Median−1σ Floor
 
-Standard z-score normalization was initially tested but produced excessively wide strength gaps (Δ ≈ 3.5), resulting in 95%+ win probabilities for favourites — unrealistic for knockout football. Standard min-max (0 to 1) was also rejected because it maps the weakest team to exactly zero, which is unfair (e.g., Tottenham's Points_Pct becoming 0.0).
+Standard z-score normalization was initially tested but produced excessively wide strength gaps (Δ ≈ 3.5) resulting in 95%+ win probabilities for favourites which is unrealistic for knockout football. Standard min-max (0 to 1) was also rejected because it maps the weakest team to exactly zero which is unfair (e.g., Tottenham's Points_Pct becoming 0.0).
 
-Five normalization methods were evaluated: proportion of max, arbitrary floored min-max, mean-anchored floor, log-transform, and median−1σ floor. The selection criterion was realism: the most lopsided matchup should produce ≤75% win probability, and mid-table matchups should stay around 55–60%, consistent with historical UCL knockout upset rates (underdogs win ~30–40%).
+Five normalization methods were evaluated: proportion of max, arbitrary floored min-max, mean-anchored floor, log-transform, and median−1σ floor. The selection criterion was realism: the most lopsided matchup should produce ≤75% win probability and mid-table matchups should stay around 55–60%, consistent with historical UCL knockout upset rates (underdogs win ~30–40%).
 
-**Median−1σ floor was selected.** For each feature, the floor is computed as `floor = clamp((median − std) / max, 0.05, 0.5)`, then the feature is scaled to `[floor, 1.0]`. This is statistically grounded (adapts to each feature's distribution), produces a max win probability of ~66%, and preserves enough separation for genuinely stronger teams to have a meaningful edge.
+**Median−1σ floor was selected.** For each feature, the floor is computed as `floor = clamp((median − std) / max, 0.05, 0.5)`, then the feature is scaled to `[floor, 1.0]`. This is statistically grounded (adapts to each feature's distribution) producing a max win probability of ~66%, and preserves enough separation for genuinely stronger teams to have a meaningful edge.
 
 #### Composite Strength Score
 
@@ -51,7 +46,7 @@ Features are combined as: `Strength = 0.30 × GF_norm + 0.35 × (1 − GA_norm) 
 
 #### Logistic Win Probability
 
-For each tie: `P(A wins) = 1 / (1 + e^(−k × Δ))` where `Δ = Strength_A − Strength_B` and `k = 1.5`. At Δ = 0 it is 50/50; at the maximum observed gap (~0.44), the favourite wins approximately 66% of the time.
+For each tie: `P(A wins) = 1 / (1 + e^(−k × Δ))` where `Δ = Strength_A − Strength_B` and `k = 1.5`. At Δ = 0 it is 50/50; at the maximum observed gap (~0.44). 
 
 #### Monte Carlo Bracket Simulation (10,000 runs)
 
@@ -141,7 +136,7 @@ These two outputs answer different questions and should not be confused.
 
 The **Final Composite Score table** above aggregates 10,000+ simulations across all three datasets plus a weight sensitivity sweep. It answers: "across all possible bracket outcomes, who wins the tournament most often?" Bayern Munich leads at 11.1% because their high strength score gives them favourable odds in every possible matchup they could face — regardless of which specific path they take.
 
-The **Predicted Bracket** shown further below answers a different question: "if we follow the single most likely winner at every tie, who emerges?" This is a chain of conditional outcomes — each round's matchup depends on who won the previous round. Arsenal wins this path because while their individual matchup margins are modest (62% vs Leverkusen, 51% vs Sporting CP in the QF, 55% vs Barcelona in the SF), their bracket half is slightly more favourable. Bayern, despite having a higher overall tournament win rate, faces a tighter semi-final and a lower probability of reaching the final via their specific bracket path.
+The **Predicted Bracket** shown further below answers a different question: "if we follow the single most likely winner at every tie, who emerges?" This is a chain of conditional outcomes where each round's matchup depends on who won the previous round. Arsenal wins this path because while their individual matchup margins are modest (62% vs Leverkusen, 51% vs Sporting CP in the QF, 55% vs Barcelona in the SF), their bracket half is slightly more favourable. Bayern, despite having a higher overall tournament win rate, faces a tighter semi-final and a lower probability of reaching the final via their specific bracket path.
 
 In short: Bayern is the most likely champion across all simulated scenarios. Arsenal is the most likely champion if you follow the single most probable outcome at each fork. Both are valid — the 0.1% gap between them (11.1% vs 11.0%) confirms they are effectively co-favourites.
 
@@ -160,8 +155,6 @@ In short: Bayern is the most likely champion across all simulated scenarios. Ars
 
 Four of eight R16 ties are essentially coin flips (<10% margin), confirming that the Median−1σ normalization produces realistically competitive matchups.
 
----
-
 ## Key Technical Decisions
 
 | Decision | Issue | Resolution |
@@ -178,16 +171,6 @@ Four of eight R16 ties are essentially coin flips (<10% margin), confirming that
 ## Tech Stack
 
 Python 3, pandas, NumPy, SciPy (zscore), matplotlib. No ML libraries required — the approach is entirely statistical and simulation-based.
-
----
-
-## How to Run
-
-```bash
-jupyter notebook Champions_League_Prediction.ipynb
-```
-
-Execute cells sequentially. Phase 1 builds datasets, Phase 2 generates visualisations, Phase 3 runs simulations, Phase 4 produces the final bracket and predictions. All cells are self-contained with their dependencies declared at the top.
 
 ---
 
