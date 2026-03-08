@@ -177,5 +177,4 @@ Python 3, pandas, NumPy, SciPy (zscore), matplotlib. No ML libraries required â€
 - The logistic k parameter (1.5) and feature weights (0.30/0.35/0.35) are reasonable defaults, not optimised against historical knockout outcomes.
 
 ## Author
-
-Champions League 2025/26 Knockout Prediction â€” built iteratively with data-driven adjustments at every stage.
+[Nick Phynn](https://www.linkedin.com/in/nick-phynn-928354b4/) & [Romario Bennett](https://www.linkedin.com/in/romario-bennett-48b648220/)
