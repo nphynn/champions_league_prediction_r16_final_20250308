@@ -62,7 +62,6 @@ Rather than deterministically advancing the stronger team (which was rejected as
 
 **Final score**: `Final = 0.40 × Ensemble + 0.30 × Sensitivity + 0.30 × Avg(A,B,C)`.
 
----
 
 ## Predicted Bracket (Most Likely Path)
 
@@ -102,8 +101,6 @@ Atletico Madrid ─┐                │                 │              │
                     ├─ Arsenal ────┘
         Arsenal ─┘
 ```
-
----
 
 ## Results
 
@@ -166,13 +163,11 @@ Four of eight R16 ties are essentially coin flips (<10% margin), confirming that
 | Arbitrary floor (0.10) | Not data-driven; chosen without justification | Replaced with statistical floor: `(median − σ) / max`, clamped [0.05, 0.5] |
 | k steepness (1.5) | Controls logistic curve sensitivity | Validated: max matchup P ≈ 66%, consistent with real knockout upset rates |
 
----
 
 ## Tech Stack
 
 Python 3, pandas, NumPy, SciPy (zscore), matplotlib. No ML libraries required — the approach is entirely statistical and simulation-based.
 
----
 
 ## Limitations
 
@@ -180,8 +175,6 @@ Python 3, pandas, NumPy, SciPy (zscore), matplotlib. No ML libraries required �
 - The model uses only three features (GF/g, GA/g, Points_Pct). Factors like squad depth, injuries, head-to-head history, home/away legs, and managerial tactics are not captured.
 - UEFA coefficients are country-level, not club-level. A mid-table EPL team gets the same coefficient as the league leader.
 - The logistic k parameter (1.5) and feature weights (0.30/0.35/0.35) are reasonable defaults, not optimised against historical knockout outcomes.
-
----
 
 ## Author
 
