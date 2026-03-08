@@ -135,7 +135,7 @@ The **Final Composite Score table** above aggregates 10,000+ simulations across 
 
 The **Predicted Bracket** shown further below answers a different question: "if we follow the single most likely winner at every tie, who emerges?" This is a chain of conditional outcomes where each round's matchup depends on who won the previous round. Arsenal wins this path because while their individual matchup margins are modest (62% vs Leverkusen, 51% vs Sporting CP in the QF, 55% vs Barcelona in the SF), their bracket half is slightly more favourable. Bayern, despite having a higher overall tournament win rate, faces a tighter semi-final and a lower probability of reaching the final via their specific bracket path.
 
-In short: Bayern is the most likely champion across all simulated scenarios. Arsenal is the most likely champion if you follow the single most probable outcome at each fork. Both are valid — the 0.1% gap between them (11.1% vs 11.0%) confirms they are effectively co-favourites.
+In short: Bayern is the most likely champion across all simulated scenarios. Arsenal is the most likely champion if you follow the single most probable outcome at each fork. Both are valid — the 0.1% gap between them (11.1% vs 11.0%) confirms they are effectively co-favourites. Arsenal wins when you follow the single most likely outcome at each round (they met in the final and Arsenal edged it 52.3% to 47.7%.)
 
 ### R16 Upset Watch
 
