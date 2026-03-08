@@ -2,13 +2,9 @@
 
 A data-driven approach to predicting the 2025/26 UCL Round of 16 through to the Final, using composite strength scoring, logistic win probabilities, and Monte Carlo bracket simulation across three independently constructed datasets.
 
----
-
 ## Objective
 
 Predict the outcome of all 8 Round of 16 ties and propagate winners through Quarter-Finals, Semi-Finals, and the Final using a fixed knockout bracket — not a league-style probability ranking.
-
----
 
 ## Data Sources
 
@@ -17,8 +13,6 @@ Predict the outcome of all 8 Round of 16 ties and propagate winners through Quar
 **Champions League group/league phase stats**: 8 matches per team — GF, GA, Points.
 
 **UEFA Country Coefficients (2025/26)**: England (22.29), Germany (17.57), Spain (17.41), Italy (17.36), Portugal (16.60), France (14.96), Turkey (10.28), Norway (10.28).
-
----
 
 ## Methodology
 
