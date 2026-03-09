@@ -1,6 +1,6 @@
 # UEFA Champions League 2025/26 â€” Knockout Stage Prediction
 
-A data-driven approach to predicting the 2025/26 UCL Round of 16 through to the Final using composite strength scoring, logistic win probabilities, and Monte Carlo bracket simulation across three independently constructed datasets.
+A data-driven approach to predicting the 2025/26 UCL Round of 16 through to the Final using composite strength scoring, logistic win probabilities, and Monte Carlo bracket simulation across three independently constructed datasets. I generate my own datasets using only variables that result in actual game output (goals scored, goals conceded, and points percentage). No xG or other computed probability metrics.
 
 ## Objective
 
@@ -177,4 +177,4 @@ Python 3, pandas, NumPy, SciPy (zscore), matplotlib. No ML libraries required â€
 - The logistic k parameter (1.5) and feature weights (0.30/0.35/0.35) are reasonable defaults, not optimised against historical knockout outcomes.
 
 ## Author
-[Nick Phynn](https://www.linkedin.com/in/nick-phynn-928354b4/) & [Romario Bennett](https://www.linkedin.com/in/romario-bennett-48b648220/)
+[Nick Phynn](https://www.linkedin.com/in/nick-phynn-928354b4/)
